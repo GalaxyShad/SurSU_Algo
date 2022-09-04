@@ -3,27 +3,76 @@
 #include <time.h>
 #include <math.h>
 
+#define N 8
+
 typedef int key_t;
+
+typedef void (*fillArrFun_t)(key_t*, size_t, key_t, key_t, int);
 
 int random_int(int min, int max);
 
+void print_arr(const int* arr, const char* modifier, size_t n);
 void fill_arr_random(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_linear_upwards(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_linear_downwards(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r);
-void fill_arr_unk(key_t* arr, size_t n, key_t min, key_t max, int r);
+void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r);
+void fill_arr_stepped(key_t* arr, size_t n, key_t min, key_t max, int r);
+void fill_arr_quasi_ordered(key_t* arr, size_t n, key_t min, key_t max, int r);
 
-void print_arr_int(const int* arr, size_t n);
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////
+int main() {
+	srand(time(NULL));
+
+	key_t arr[N] = {1, 2, 3};
+
+	const fillArrFun_t functions[] = {
+		fill_arr_random,
+		fill_arr_linear_upwards,
+		fill_arr_linear_downwards,
+		fill_arr_sin,
+		fill_arr_sawtooth,
+		fill_arr_stepped,
+		fill_arr_quasi_ordered
+	};
+
+	const char functionNames[][26] = {
+		"fill_arr_random",
+		"fill_arr_linear_upwards",
+		"fill_arr_linear_downwards",
+		"fill_arr_sin",
+		"fill_arr_sawtooth",
+		"fill_arr_stepped",
+		"fill_arr_quasi_ordered"
+	};
+
+	for (int i = 0; i < 7; ++i) {
+		printf("Function: %s\n", functionNames[i]);
+
+		functions[i](arr, N, 2, 7, 4);
+
+		print_arr((const int*)arr, "%d ", N);
+		printf("\n");
+	}
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
 int random_int(int min, int max) {
-	return (rand() << 15 + rand()) % (max - min) + min;
+	return rand() % (max - min) + min;
+	// return (rand() << 15 + rand()) % (max - min) + min;
 }
 
 
-void print_arr_int(const int* arr, size_t n) {
+void print_arr(const int* arr, const char* modifier, size_t n) {
 	for (int i = 0; i < n; ++i) {
-		printf("%d ", arr[i]);
+		printf(modifier, arr[i]);
+		printf(" ");
 	}
 
 	printf("\n");
@@ -72,36 +121,32 @@ void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 }
 
 
-void fill_arr_unk(key_t* arr, size_t n, key_t min, key_t max, int r) {
-	// TODO
+// https://studfile.net/preview/9690421/page:5/
+void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r) {
+	if (!arr) return;
+
+	key_t amplitude = max - min;
+	double period = 2;
+
+	for (int i = 0; i < n; ++i) {
+		double step = (double)i  / (n - 1);
+
+		double sp = step / period;
+
+		arr[i] = sp - fabs(sp);
+	}
 }
 
 
-#define N 30
+void fill_arr_stepped(key_t* arr, size_t n, key_t min, key_t max, int r) {
 
-int main() {
-	srand(time(NULL));
-
-	key_t arr[N] = {0};
-	struct {
-		key_t start;
-		key_t end;
-	} interval = {2, 6};
-
-	fill_arr_random(arr, N, interval.start, interval.end, 0);
-	print_arr_int((const int*)arr, N);
-
-	fill_arr_linear_upwards(arr, N, interval.start, interval.end, 0);
-	print_arr_int((const int*)arr, N);
-
-	fill_arr_linear_downwards(arr, N, 2, 3, 0);
-	print_arr_int((const int*)arr, N);
-
-	fill_arr_sin(arr, N, 3, 12, 0);
-	print_arr_int((const int*)arr, N);
-
-	fill_arr_unk(arr, N, 3, 12, 0);
-	print_arr_int((const int*)arr, N);
-
-	return 0;
 }
+
+
+void fill_arr_quasi_ordered(key_t* arr, size_t n, key_t min, key_t max, int r) {
+
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
