@@ -1,17 +1,20 @@
+#define _USE_MATH_DEFINES
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
 
-#define N 8
+#define N 			13
 
-typedef int key_t;
+#define MODIFIER 	"lf"
+typedef double key_t;
 
 typedef void (*fillArrFun_t)(key_t*, size_t, key_t, key_t, int);
 
 int random_int(int min, int max);
+double lerp(double start, double end, double val);
 
-void print_arr(const int* arr, const char* modifier, size_t n);
 void fill_arr_random(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_linear_upwards(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_linear_downwards(key_t* arr, size_t n, key_t min, key_t max, int r);
@@ -26,7 +29,7 @@ void fill_arr_quasi_ordered(key_t* arr, size_t n, key_t min, key_t max, int r);
 int main() {
 	srand(time(NULL));
 
-	key_t arr[N] = {1, 2, 3};
+	key_t arr[N];
 
 	const fillArrFun_t functions[] = {
 		fill_arr_random,
@@ -53,7 +56,8 @@ int main() {
 
 		functions[i](arr, N, 2, 7, 4);
 
-		print_arr((const int*)arr, "%d ", N);
+		for (int j = 0; j < N; j++) printf("%"MODIFIER" ", arr[j]);
+
 		printf("\n");
 	}
 
@@ -63,19 +67,14 @@ int main() {
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-int random_int(int min, int max) {
-	return rand() % (max - min) + min;
-	// return (rand() << 15 + rand()) % (max - min) + min;
+double lerp(double start, double end, double val) {
+	return start + val * (end - start);
 }
 
 
-void print_arr(const int* arr, const char* modifier, size_t n) {
-	for (int i = 0; i < n; ++i) {
-		printf(modifier, arr[i]);
-		printf(" ");
-	}
-
-	printf("\n");
+int random_int(int min, int max) {
+	return rand() % (max - min) + min;
+	// return (rand() << 15 + rand()) % (max - min) + min;
 }
 
 
@@ -94,7 +93,7 @@ void fill_arr_linear_upwards(key_t * arr, size_t n, key_t min, key_t max, int r)
 	key_t delta = (max - min);
 
 	for (int i = 0; i < n; ++i) {
-		arr[i] = delta * ((double)i / (n-1)) + min;
+		arr[i] = delta * (i / (double)(n-1)) + min;
 	}
 }
 
@@ -104,8 +103,8 @@ void fill_arr_linear_downwards(key_t * arr, size_t n, key_t min, key_t max, int 
 
 	key_t delta = (max - min);
 
-	for (int i = n-1; i >= 0; i--) {
-		arr[i] = delta * (((double)n - i) / n) + min;
+	for (int i = 0; i < n; i++) {
+		arr[i] = delta * ((double)(n - 1 - i) / (n-1)) + min;
 	}
 }
 
@@ -113,10 +112,12 @@ void fill_arr_linear_downwards(key_t * arr, size_t n, key_t min, key_t max, int 
 void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 	if (!arr) return;
 
-	int delta = max - min;
+	double delta = max - min;
+	double amplitude = delta / 2.0;
+	double period = 0.25;
 
 	for (int i = 0; i < n; ++i) {
-		arr[i] = sin(i) * delta + min;
+		arr[i] = cos(i * M_PI_2 * period) * amplitude + min + amplitude;
 	}
 }
 
@@ -125,15 +126,16 @@ void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r) {
 	if (!arr) return;
 
-	key_t amplitude = max - min;
+	double delta = max - min;
 	double period = 2;
 
 	for (int i = 0; i < n; ++i) {
-		double step = (double)i  / (n - 1);
+		double val = lerp(
+			min, max, 
+			((double)i / (n-1)) * period 
+		);
 
-		double sp = step / period;
-
-		arr[i] = sp - fabs(sp);
+		arr[i] = val;
 	}
 }
 
