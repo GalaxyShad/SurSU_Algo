@@ -130,16 +130,13 @@ void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 
 // https://studfile.net/preview/9690421/page:5/
 void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r) {
-	// if (!arr) return;
+	if (!arr) return;
 
-	// int delta = max - min;
-	// double amplitude = delta;
+	double delta = max - min;
 
-	// for (int i = 0; i < n; ++i) {
-	// 	double val = i / (n - 0.0);
-
-	// 	arr[i] = (int)(i * period) % (delta+1);
-	// }
+	for (int i = 0; i < n; ++i) {
+		arr[i] = ((double)(i % (r+1)) / r) * delta + min;
+	}
 }
 
 
