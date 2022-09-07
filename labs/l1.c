@@ -60,7 +60,7 @@ int main() {
 	for (int i = 0; i < 7; ++i) {
 		printf("Function: %s\n", functionNames[i]);
 
-		functions[i](arr, N, 2, 7, 4);
+		functions[i](arr, N, 2, 8, 4);
 
 		for (int j = 0; j < N; j++) printf("%"MODIFIER" ", arr[j]);
 
@@ -117,13 +117,14 @@ void fill_arr_linear_downwards(key_t * arr, size_t n, key_t min, key_t max, int 
 
 void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 	if (!arr) return;
+	if (r == 0) return;
 
 	double delta = max - min;
 	double amplitude = delta / 2.0;
 	double period = 0.25;
 
 	for (int i = 0; i < n; ++i) {
-		arr[i] = cos(i * M_PI_2 * period) * amplitude + min + amplitude;
+		arr[i] = cos((i * M_PI * 2) / r) * amplitude + min + amplitude;
 	}
 }
 
@@ -131,6 +132,7 @@ void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 // https://studfile.net/preview/9690421/page:5/
 void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r) {
 	if (!arr) return;
+	if (r == 0) return;
 
 	double delta = max - min;
 
@@ -141,7 +143,14 @@ void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r) {
 
 
 void fill_arr_stepped(key_t* arr, size_t n, key_t min, key_t max, int r) {
+	if (!arr) return;
+	if (r == 0) return;
 
+	double delta = max - min;
+
+	for (int i = 0; i < n; ++i) {
+		arr[i] = round(delta * (i / (double)(n-1))) + min;
+	}
 }
 
 
