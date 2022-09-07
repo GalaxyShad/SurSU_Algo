@@ -5,7 +5,7 @@
 #include <time.h>
 #include <math.h>
 
-#define N 				8		// размер массива
+#define N 				16		// размер массива
 #define VAR_TYPE 		double	// тип данных массив
 #define MODIFIER 		"lf"	// модификатор для printf
 
@@ -60,7 +60,7 @@ int main() {
 	for (int i = 0; i < 7; ++i) {
 		printf("Function: %s\n", functionNames[i]);
 
-		functions[i](arr, N, 2, 8, 4);
+		functions[i](arr, N, 2, 8, 5);
 
 		for (int j = 0; j < N; j++) printf("%"MODIFIER" ", arr[j]);
 
@@ -147,9 +147,10 @@ void fill_arr_stepped(key_t* arr, size_t n, key_t min, key_t max, int r) {
 	if (r == 0) return;
 
 	double delta = max - min;
+	double period = n / r;
 
 	for (int i = 0; i < n; ++i) {
-		arr[i] = round(delta * (i / (double)(n-1))) + min;
+		arr[i] = delta * (floor( (i / (double)(n-1)) * period) / period) + min;
 	}
 }
 
