@@ -5,16 +5,22 @@
 #include <time.h>
 #include <math.h>
 
-#define N 			13
+#define N 				8		// размер массива
+#define VAR_TYPE 		double	// тип данных массив
+#define MODIFIER 		"lf"	// модификатор для printf
 
-#define MODIFIER 	"lf"
-typedef double key_t;
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+typedef VAR_TYPE key_t;
 
 typedef void (*fillArrFun_t)(key_t*, size_t, key_t, key_t, int);
 
+// utils
 int random_int(int min, int max);
 double lerp(double start, double end, double val);
 
+// buisness logic
 void fill_arr_random(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_linear_upwards(key_t* arr, size_t n, key_t min, key_t max, int r);
 void fill_arr_linear_downwards(key_t* arr, size_t n, key_t min, key_t max, int r);
@@ -124,19 +130,16 @@ void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 
 // https://studfile.net/preview/9690421/page:5/
 void fill_arr_sawtooth(key_t* arr, size_t n, key_t min, key_t max, int r) {
-	if (!arr) return;
+	// if (!arr) return;
 
-	double delta = max - min;
-	double period = 2;
+	// int delta = max - min;
+	// double amplitude = delta;
 
-	for (int i = 0; i < n; ++i) {
-		double val = lerp(
-			min, max, 
-			((double)i / (n-1)) * period 
-		);
+	// for (int i = 0; i < n; ++i) {
+	// 	double val = i / (n - 0.0);
 
-		arr[i] = val;
-	}
+	// 	arr[i] = (int)(i * period) % (delta+1);
+	// }
 }
 
 
