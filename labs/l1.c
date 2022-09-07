@@ -6,8 +6,8 @@
 #include <math.h>
 
 #define N 				16		// размер массива
-#define VAR_TYPE 		double	// тип данных массив
-#define MODIFIER 		"lf"	// модификатор для printf
+#define VAR_TYPE 		int	// тип данных массив
+#define MODIFIER 		"d"	// модификатор для printf
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -18,6 +18,7 @@ typedef void (*fillArrFun_t)(key_t*, size_t, key_t, key_t, int);
 
 // utils
 int random_int(int min, int max);
+double random_double(double min, double max);
 double lerp(double start, double end, double val);
 
 // buisness logic
@@ -83,12 +84,17 @@ int random_int(int min, int max) {
 	// return (rand() << 15 + rand()) % (max - min) + min;
 }
 
+double random_double(double min, double max) {
+	return ((double)rand() / RAND_MAX) * (max - min) + min;
+}
+
 
 void fill_arr_random(key_t * arr, size_t n, key_t min, key_t max, int r) {
 	if (!arr) return;
 
 	for (int i = 0; i < n; ++i) {
-		arr[i] = random_int((int)min, (int)max); 
+		arr[i] = (key_t)random_double(min, max); 
+		//arr[i] = random_int((int)min, (int)max); 
 	}
 }
 
