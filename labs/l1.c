@@ -5,9 +5,9 @@
 #include <time.h>
 #include <math.h>
 
-#define N 				16		// размер массива
-#define VAR_TYPE 		int	// тип данных массив
-#define MODIFIER 		"d"	// модификатор для printf
+#define N 				16		
+#define VAR_TYPE 		int		
+#define MODIFIER 		"d"		
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
