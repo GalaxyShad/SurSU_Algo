@@ -16,6 +16,11 @@ typedef VAR_TYPE key_t;
 
 typedef void (*fillArrFun_t)(key_t*, size_t, key_t, key_t, int);
 
+typedef struct ftableCell {
+	char name[26];
+	fillArrFun_t invokeFunc;
+} ftableCell_t;
+
 // utils
 int random_int(int min, int max);
 double random_double(double min, double max);
@@ -38,30 +43,20 @@ int main() {
 
 	key_t arr[N];
 
-	const fillArrFun_t functions[] = {
-		fill_arr_random,
-		fill_arr_linear_upwards,
-		fill_arr_linear_downwards,
-		fill_arr_sin,
-		fill_arr_sawtooth,
-		fill_arr_stepped,
-		fill_arr_quasi_ordered
-	};
-
-	const char functionNames[][26] = {
-		"fill_arr_random",
-		"fill_arr_linear_upwards",
-		"fill_arr_linear_downwards",
-		"fill_arr_sin",
-		"fill_arr_sawtooth",
-		"fill_arr_stepped",
-		"fill_arr_quasi_ordered"
+	const ftableCell_t functionsTable[] = {
+		{ "fill_arr_random", 			fill_arr_random },
+		{ "fill_arr_linear_upwards", 	fill_arr_linear_upwards },
+		{ "fill_arr_linear_downwards", 	fill_arr_linear_downwards },
+		{ "fill_arr_sin", 				fill_arr_sin },
+		{ "fill_arr_sawtooth", 			fill_arr_sawtooth },
+		{ "fill_arr_stepped", 			fill_arr_stepped },
+		{ "fill_arr_quasi_ordered", 	fill_arr_quasi_ordered }
 	};
 
 	for (int i = 0; i < 7; ++i) {
-		printf("Function: %s\n", functionNames[i]);
+		printf("Function: %s\n", functionsTable[i].name);
 
-		functions[i](arr, N, 2, 8, 5);
+		functionsTable[i].invokeFunc(arr, N, 2, 8, 5);
 
 		for (int j = 0; j < N; j++) printf("%"MODIFIER" ", arr[j]);
 
