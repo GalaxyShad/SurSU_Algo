@@ -31,7 +31,7 @@ typedef VAR_TYPE key_t;
 typedef void (*fillArrFun_t)(key_t*, size_t, key_t, key_t, int);
 
 typedef struct ftableCell {
-	char name[26];
+	char name[62];
 	fillArrFun_t invoke;
 } ftableCell_t;
 
@@ -53,17 +53,19 @@ void 	fill_arr_quasi_ordered(key_t* arr, size_t n, key_t min, key_t max, int r);
 
 int main() {
 	srand(time(NULL));
+	system("chcp 1251 > nul");
 
 	key_t arr[N];
 
 	const ftableCell_t functionsTable[FUNCTIONS_COUNT] = {
-		{ "fill_arr_random", 			fill_arr_random 			},
-		{ "fill_arr_linear_upwards", 	fill_arr_linear_upwards 	},
-		{ "fill_arr_linear_downwards", 	fill_arr_linear_downwards 	},
-		{ "fill_arr_sin", 				fill_arr_sin 				},
-		{ "fill_arr_sawtooth", 			fill_arr_sawtooth 			},
-		{ "fill_arr_stepped", 			fill_arr_stepped 			},
-		{ "fill_arr_quasi_ordered", 	fill_arr_quasi_ordered 		}
+		{ "Случайная", 							fill_arr_random 			},
+		{ "Упорядоченная", 						fill_arr_linear_upwards 	},
+		{ "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
+
+		{ "Пилообразная", 						fill_arr_sawtooth 			},
+		{ "Синусоидальная", 					fill_arr_sin 				},
+		{ "Ступенчатая", 						fill_arr_stepped 			},
+		{ "Квази-упорядоченная", 				fill_arr_quasi_ordered 		}
 	};
 
 	for (int i = 0; i < FUNCTIONS_COUNT; ++i) {
