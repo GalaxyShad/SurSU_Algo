@@ -6,11 +6,24 @@
 #include <math.h>
 #include <Windows.h>
 
-#define N 				16		
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+	
 #define VAR_TYPE 		double		
 #define MODIFIER 		"0.2lf"	
 
+#define RANGE_LOW   	500000
+#define RANGE_HIGH		5000000
+#define RANGE_STEP		500000
+
+#define INVOKES_COUNT	10
+		   		 
 //////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+#define N 				16	
+#define FUNCTIONS_COUNT	7
+
 //////////////////////////////////////////////////////////////////////////////
 
 typedef VAR_TYPE key_t;
@@ -43,7 +56,7 @@ int main() {
 
 	key_t arr[N];
 
-	const ftableCell_t functionsTable[] = {
+	const ftableCell_t functionsTable[FUNCTIONS_COUNT] = {
 		{ "fill_arr_random", 			fill_arr_random 			},
 		{ "fill_arr_linear_upwards", 	fill_arr_linear_upwards 	},
 		{ "fill_arr_linear_downwards", 	fill_arr_linear_downwards 	},
@@ -53,12 +66,12 @@ int main() {
 		{ "fill_arr_quasi_ordered", 	fill_arr_quasi_ordered 		}
 	};
 
-	for (int i = 0; i < 7; ++i) {
+	for (int i = 0; i < FUNCTIONS_COUNT; ++i) {
 		printf("Function: %s\n", functionsTable[i].name);
 
 		functionsTable[i].invoke(arr, N, 2, 8, 5);
 
-		for (int j = 0; j < N; j++) printf("%"MODIFIER" ", arr[j]);
+		for (int j = 0; j < FUNCTIONS_COUNT; j++) printf("%"MODIFIER" ", arr[j]);
 
 		printf("\n");
 	}
@@ -67,29 +80,26 @@ int main() {
 
 	///////////////////////////////////////////////////////////////////////////
 
-	DWORD  t0, t1, tdelta;
-	size_t range_low  = 500000, 
-		   range_high = 5000000, 
-		   range_step = 500000;
+	DWORD t0, t1, tdelta;
 
 	FILE* csv_file = fopen("out.csv", "w");
+	if (csv_file == NULL) printf("\a[ERR] Cannot open a file!\n");
 
-	for (int n = range_low; n <= range_high; n += range_step) 
+	for (int n = RANGE_LOW; n <= RANGE_HIGH; n += RANGE_STEP) 
 		fprintf(csv_file, ";%d", n);
 	fprintf(csv_file, "\n");
 
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < FUNCTIONS_COUNT; i++) {
 		printf("Function: %s\n"
 			   "Time delta: ", functionsTable[i].name);
 
 		fprintf(csv_file, "%s;", functionsTable[i].name);
 
-		for (int n = range_low; n <= range_high; n += range_step) {
+		for (size_t n = RANGE_LOW; n <= RANGE_HIGH; n += RANGE_STEP) {
 			key_t* test_arr = (key_t*)malloc(sizeof(key_t) * n);
 
 			tdelta = 0;
-
-			for (int j = 0; j < 10; j++) {
+			for (int j = 0; j < INVOKES_COUNT; j++) {
 				t0 = GetTickCount();
 				functionsTable[i].invoke(test_arr, n, 2, 8, 5);
 				t1 = GetTickCount();
@@ -99,8 +109,8 @@ int main() {
 			
 			free(test_arr); 
 
-			fprintf(csv_file, "%d;", tdelta / 10);
-			printf("%d ", tdelta / 10);
+			fprintf(csv_file, "%d;", tdelta / INVOKES_COUNT);
+			printf("%d ", tdelta / INVOKES_COUNT);
 		}
 
 		fprintf(csv_file, "\n");
@@ -118,8 +128,8 @@ int main() {
 
 int random_int(int min, int max) {
 	return rand() % (max - min) + min;
-	// return (rand() << 15 + rand()) % (max - min) + min;
 }
+
 
 double random_double(double min, double max) {
 	return ((double)rand() / RAND_MAX) * (max - min) + min;
