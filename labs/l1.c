@@ -7,7 +7,7 @@
 
 #define N 				16		
 #define VAR_TYPE 		int		
-#define MODIFIER 		"d"		
+#define MODIFIER 		"d"	
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,6 @@ typedef struct ftableCell {
 // utils
 int random_int(int min, int max);
 double random_double(double min, double max);
-double lerp(double start, double end, double val);
 
 // buisness logic
 void fill_arr_random(key_t* arr, size_t n, key_t min, key_t max, int r);
@@ -44,13 +43,13 @@ int main() {
 	key_t arr[N];
 
 	const ftableCell_t functionsTable[] = {
-		{ "fill_arr_random", 			fill_arr_random },
-		{ "fill_arr_linear_upwards", 	fill_arr_linear_upwards },
-		{ "fill_arr_linear_downwards", 	fill_arr_linear_downwards },
-		{ "fill_arr_sin", 				fill_arr_sin },
-		{ "fill_arr_sawtooth", 			fill_arr_sawtooth },
-		{ "fill_arr_stepped", 			fill_arr_stepped },
-		{ "fill_arr_quasi_ordered", 	fill_arr_quasi_ordered }
+		{ "fill_arr_random", 			fill_arr_random 			},
+		{ "fill_arr_linear_upwards", 	fill_arr_linear_upwards 	},
+		{ "fill_arr_linear_downwards", 	fill_arr_linear_downwards 	},
+		{ "fill_arr_sin", 				fill_arr_sin 				},
+		{ "fill_arr_sawtooth", 			fill_arr_sawtooth 			},
+		{ "fill_arr_stepped", 			fill_arr_stepped 			},
+		{ "fill_arr_quasi_ordered", 	fill_arr_quasi_ordered 		}
 	};
 
 	for (int i = 0; i < 7; ++i) {
@@ -69,11 +68,6 @@ int main() {
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-double lerp(double start, double end, double val) {
-	return start + val * (end - start);
-}
-
-
 int random_int(int min, int max) {
 	return rand() % (max - min) + min;
 	// return (rand() << 15 + rand()) % (max - min) + min;
@@ -89,7 +83,6 @@ void fill_arr_random(key_t * arr, size_t n, key_t min, key_t max, int r) {
 
 	for (int i = 0; i < n; ++i) {
 		arr[i] = (key_t)random_double(min, max); 
-		//arr[i] = random_int((int)min, (int)max); 
 	}
 }
 
@@ -122,7 +115,6 @@ void fill_arr_sin(key_t* arr, size_t n, key_t min, key_t max, int r) {
 
 	double delta = max - min;
 	double amplitude = delta / 2.0;
-	double period = 0.25;
 
 	for (int i = 0; i < n; ++i) {
 		arr[i] = cos((i * M_PI * 2) / r) * amplitude + min + amplitude;
