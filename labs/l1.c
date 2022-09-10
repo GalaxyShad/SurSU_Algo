@@ -10,7 +10,6 @@
 #define VAR_TYPE 		double		
 #define MODIFIER 		"0.2lf"	
 
-#define N_MAX			1000000
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
@@ -65,7 +64,6 @@ int main() {
 	}
 
 	printf("\n");
-	// return 0;
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -76,32 +74,41 @@ int main() {
 
 	FILE* csv_file = fopen("out.csv", "w");
 
+	for (int n = range_low; n <= range_high; n += range_step) 
+		fprintf(csv_file, ";%d", n);
+	fprintf(csv_file, "\n");
+
 	for (int i = 0; i < 7; i++) {
 		printf("Function: %s\n"
 			   "Time delta: ", functionsTable[i].name);
 
-		fprintf(csv_file, "\nFucntion;%s\n", functionsTable[i].name);
+		fprintf(csv_file, "%s;", functionsTable[i].name);
 
 		for (int n = range_low; n <= range_high; n += range_step) {
 			key_t* test_arr = (key_t*)malloc(sizeof(key_t) * n);
 
-			t0 = GetTickCount();
-			functionsTable[i].invoke(test_arr, n, 2, 8, 5);
-			t1 = GetTickCount();
-			
-			tdelta = t1 - t0;
+			tdelta = 0;
 
+			for (int j = 0; j < 10; j++) {
+				t0 = GetTickCount();
+				functionsTable[i].invoke(test_arr, n, 2, 8, 5);
+				t1 = GetTickCount();
+
+				tdelta += t1 - t0;
+			}
+			
 			free(test_arr); 
 
-			fprintf(csv_file, "%d;%d\n", n, tdelta);
-			printf("%d ", tdelta);
+			fprintf(csv_file, "%d;", tdelta / 10);
+			printf("%d ", tdelta / 10);
 		}
 
+		fprintf(csv_file, "\n");
 		printf("\n");
 	}
 
 	fclose(csv_file);
-	
+	printf("end");
 
 	return 0;
 }
@@ -184,7 +191,7 @@ void fill_arr_stepped(key_t* arr, size_t n, key_t min, key_t max, int r) {
 	double period = n / r;
 
 	for (int i = 0; i < n; ++i) {
-		arr[i] = delta * (floor( (i / (double)(n-1)) * period) / period) + 
+		arr[i] = delta * ((int)( (i / (double)(n-1)) * period) / period) + 
 				 random_double(0.0, period / 4)
 				 + min;
 	}
