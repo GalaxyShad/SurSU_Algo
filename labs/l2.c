@@ -98,14 +98,14 @@ void sort_arr_bubble_m(key_t* arr, size_t element_size, size_t n, cmpFun_t compa
     }
 }
 
-static int _quick_sort_partition(key_t* arr, int low, int high) {
+static int _quick_sort_partition(key_t* arr, int low, int high, cmpFun_t compareFunction) {
     key_t value = arr[high];
 
     int i = low - 1, j = high;
     for (;;)
     {
-        while (value > arr[++i]);
-        while (value < arr[--j]) if (j == low) break;
+        while (compareFunction(&value, &arr[++i]));
+        while (!compareFunction(&value, &arr[--j])) if (j == low) break;
         
         if (i >= j) break;
         swap(&arr[i], &arr[j]);
@@ -114,18 +114,18 @@ static int _quick_sort_partition(key_t* arr, int low, int high) {
     return i;
 }
 
-static void _quick_sort_range(key_t* arr, int low, int high) {
-    int PartitionIndex;
+static void _quick_sort_range(key_t* arr, int low, int high, cmpFun_t compareFunction) {
+    int partitionIndex;
     if (high - low <= 0)
         return;
 
-    PartitionIndex = Partition(arr, low, high);
-    Quick(A, Low, PartitionIndex - 1);
-    Quick(A, PartitionIndex + 1, High);
+    partitionIndex = _quick_sort_partition(arr, low, high, compareFunction);
+    _quick_sort_range(arr, low, partitionIndex - 1, compareFunction);
+    _quick_sort_range(arr, partitionIndex + 1, high, compareFunction);
 }
 
 void sort_arr_quick(key_t* arr, size_t element_size, size_t n, cmpFun_t compareFunction) {
-    _quick_sort_range(arr, 0, n-1);
+    _quick_sort_range(arr, 0, n-1, compareFunction);
 }
 
 void sort_arr_quick_m(key_t* arr, size_t element_size, size_t n, cmpFun_t compareFunction) {
@@ -170,7 +170,7 @@ int main() {
         key_t* newArr = malloc(sizeof (key_t) * N);
         memcpy(newArr, arr, sizeof(key_t) * N);
 
-        sortFuncs[i].invoke(newArr, sizeof(key_t), N, NULL);
+        sortFuncs[i].invoke(newArr, sizeof(key_t), N, comp_greater);
         printf("%s\n", sortFuncs[i].name);
         print_arr(newArr, N);
 
