@@ -13,7 +13,7 @@
 #define VAR_TYPE 		double		// тип данных для массива
 #define MODIFIER 		"0.2lf"		// модификатор для вывода массива на экран 
 
-#define INVOKES_COUNT	5			// кол-во вызовов функции заполнения
+#define INVOKES_COUNT	10			// кол-во вызовов функции заполнения
 		   		 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -34,9 +34,6 @@ typedef void (*sortFunc_t) (void*, size_t, size_t, cmpFun_t);
 typedef struct sortFuncCell {
     char        name[32];
     sortFunc_t  invoke;
-    size_t      rangeMin;
-    size_t      rangeMax;
-    size_t      rangeStep;
 } sortFuncCell_t;
 
 
@@ -221,73 +218,101 @@ int main() {
 	system("chcp 1251 > nul");
 
     const sortFuncCell_t sortFuncs[] = {
-        {"Быстрая",         sort_arr_quick,    5000, 50000, 5000},
-        {"Быстрая Мод",     sort_arr_quick_m,  5000, 50000, 5000},
-        {"std qsort",       qsort,             5000, 50000, 5000},
-
-        {"Пузырек Мод",     sort_arr_bubble_m, 5000, 14000, 1000},
-        {"Пузырек",         sort_arr_bubble,   5000, 14000, 1000},
-
+        {"std qsort",       qsort,             },
+        {"Быстрая",         sort_arr_quick,    },
+        {"Быстрая Мод",     sort_arr_quick_m,  },
         // {"Вставками",       sort_arr_insertion,},
+        {"Пузырек",         sort_arr_bubble,   },
+        {"Пузырек Мод",     sort_arr_bubble_m, },
     };
     const int sortFuncsCount = sizeof(sortFuncs) / sizeof(*sortFuncs);
 
     const ftableCell_t fillFuncs[] = {
-		{ "Пилообразная", 						fill_arr_sawtooth 			},
-        // { "Случайная", 							fill_arr_random 			},
-		// { "Упорядоченная", 						fill_arr_linear_upwards 	},
-		// { "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
+        { "Случайная", 							fill_arr_random 			},
+		{ "Упорядоченная", 						fill_arr_linear_upwards 	},
+		{ "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
 
+		{ "Пилообразная", 						fill_arr_sawtooth 			},
     };
     const int fillFuncsCount = sizeof(fillFuncs) / sizeof(*fillFuncs);
 
-    FILE* csvFile = fopen("out.csv", "w"); 
-    if (!csvFile) { printf("can't open csv :("); return 1; }
+    //FILE* out = stdout;
 
-    FILE* out = stdout;
+    const size_t rangeMin  = 500;
+    const size_t rangeMax  = rangeMin*1000;
+    const size_t rangeStep = rangeMin;
 
-    for (int i = 0; i < sortFuncsCount; i++) {
-        sortFuncCell_t fsort = sortFuncs[i];  
+    for (int i = 0; i < fillFuncsCount; i++) {
+        ftableCell_t ffill = fillFuncs[i];
+        printf("%s\n", ffill.name);
 
-        fprintf(out, "%s;\n", fsort.name);
+        size_t outTableColums   = (rangeMax - rangeMin) / rangeStep + 1;
+        size_t outTableRows     = sortFuncsCount;
 
+        uint32_t* outTableDelta = malloc(outTableColums * outTableRows * sizeof(uint32_t));
+        uint64_t* outTableCmp   = malloc(outTableColums * outTableRows * sizeof(uint64_t));
 
-        for (int n =  fsort.rangeMin; n <= fsort.rangeMax; n += fsort.rangeStep)
-            fprintf(out, ";%d", n);
-        fprintf(out, "\n");
+        for (int n =  rangeMin; n <= rangeMax; n += rangeStep) {
+            key_t* arr = malloc(sizeof(key_t) * n);
+            ffill.invoke(arr, n, 0, n, 9);
 
-        for (int j = 0; j < fillFuncsCount; j++) {
-            ftableCell_t ffill = fillFuncs[j];
+            printf("%d\n", n);
 
-            fprintf(out, "%s;", ffill.name);
+            for (int j = 0; j < sortFuncsCount; j++) {
+                sortFuncCell_t fsort = sortFuncs[j];  
 
-            // Time Delta
-            for (int n =  fsort.rangeMin; 
-                     n <= fsort.rangeMax; 
-                     n += fsort.rangeStep
-            ) {
-                key_t* arr = malloc(sizeof (key_t) * n);
-                ffill.invoke(arr, n, 0, n, 9);
+                uint32_t timedelta; uint64_t compdelta;
+                test_sort_perfomance(arr, n, fsort, &timedelta, &compdelta);
 
-                DWORD delta = 0;
-                for (int k = 0; k < INVOKES_COUNT; k++) {   
-                    DWORD t1 = get_tick_count();
-                    fsort.invoke(arr, n, sizeof(key_t), comp_greater);
-                    DWORD t2 = get_tick_count();
+                printf("%s %d %lld\n", fsort.name, timedelta, compdelta);
 
-                    delta += t2 - t1;
-                }
+                int row = j;
+                int col = (n - rangeMin) / rangeStep;
+                int index = row *outTableColums + col;
 
-                delta /= INVOKES_COUNT;
-
-                fprintf(out, "%d;", delta);
-  
-                free(arr);
+                outTableDelta[index] = timedelta;
+                outTableCmp[index]   = compdelta;
             }
 
-            fprintf(out, "\n");
+            free(arr);
         }
-        fprintf(out, "\n");
+
+        char buff[64];
+        sprintf(buff, "%s.csv", ffill.name);
+        FILE* csvFile = fopen(buff, "w"); 
+        if (!csvFile) { printf("can't open csv :("); return 1; }
+
+        fprintf(csvFile, "%s;\n", ffill.name);
+        for (int k = 0; k < 2; k++) {
+            for (int n =  rangeMin; n <= rangeMax; n += rangeStep) {
+                fprintf(csvFile, ";%d", n);
+                printf(";%d", n);
+            }
+            printf("\n");
+            fprintf(csvFile, "\n");
+
+            for (int r = 0; r < outTableRows; r++) {
+                printf("%s;", sortFuncs[r]);
+                fprintf(csvFile, "%s;", sortFuncs[r]);
+                for (int c = 0; c < outTableColums; c++) {
+                    int index = r *outTableColums + c;
+                    printf("%d;", k == 0 ? outTableDelta[index] : 
+                                           outTableCmp[index]);
+
+                    fprintf(csvFile, "%d;", k == 0 ? outTableDelta[index] : 
+                                                     outTableCmp[index]);
+                }
+                printf("\n");
+                fprintf(csvFile, "\n");
+            }
+
+            printf("\n\n");
+            fprintf(csvFile, "\n\n");
+        }
+        fclose(csvFile);
+
+        free(outTableDelta);
+        free(outTableCmp);
     }
 
 
