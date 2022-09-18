@@ -1,4 +1,4 @@
 labs/*.exe
 # labs/*.csv
-build
 .vscode
+build
