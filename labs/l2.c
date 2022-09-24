@@ -207,6 +207,19 @@ void test_sort_perfomance(const key_t* srcarr, size_t n, sortFuncCell_t cellsort
 }
 
 
+void printf_ex(FILE* file, const char* fmt, ...) {
+    va_list ap;
+
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    va_end(ap);
+
+    va_start(ap, fmt);
+    vfprintf(file, fmt, ap);
+    va_end(ap);
+}
+
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
@@ -221,9 +234,9 @@ int main() {
 	system("chcp 1251 > nul");
 
     const sortFuncCell_t sortFuncs[] = {
-        {"Быстрая",         sort_arr_quick,    5000, 50000, 5000},
-        {"Быстрая Мод",     sort_arr_quick_m,  5000, 50000, 5000},
-        {"std qsort",       qsort,             5000, 50000, 5000},
+        {"Быстрая",         sort_arr_quick,    500000, 5000000, 500000},
+        {"Быстрая Мод",     sort_arr_quick_m,  500000, 5000000, 500000},
+        {"std qsort",       qsort,             500000, 5000000, 500000},
 
         {"Пузырек Мод",     sort_arr_bubble_m, 5000, 14000, 1000},
         {"Пузырек",         sort_arr_bubble,   5000, 14000, 1000},
@@ -233,10 +246,10 @@ int main() {
     const int sortFuncsCount = sizeof(sortFuncs) / sizeof(*sortFuncs);
 
     const ftableCell_t fillFuncs[] = {
-		{ "Пилообразная", 						fill_arr_sawtooth 			},
-        // { "Случайная", 							fill_arr_random 			},
-		// { "Упорядоченная", 						fill_arr_linear_upwards 	},
-		// { "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
+		// { "Пилообразная", 						fill_arr_sawtooth 			},
+        { "Случайная", 							fill_arr_random 			},
+		{ "Упорядоченная", 						fill_arr_linear_upwards 	},
+		{ "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
 
     };
     const int fillFuncsCount = sizeof(fillFuncs) / sizeof(*fillFuncs);
@@ -244,22 +257,20 @@ int main() {
     FILE* csvFile = fopen("out.csv", "w"); 
     if (!csvFile) { printf("can't open csv :("); return 1; }
 
-    FILE* out = stdout;
+    FILE* out = csvFile;
 
     for (int i = 0; i < sortFuncsCount; i++) {
         sortFuncCell_t fsort = sortFuncs[i];  
 
-        fprintf(out, "%s;\n", fsort.name);
+        printf_ex(out, "%s;=;=;=;=;=;=;=;=;=;=;=;=;\n", fsort.name);
 
-
-        for (int n =  fsort.rangeMin; n <= fsort.rangeMax; n += fsort.rangeStep)
-            fprintf(out, ";%d", n);
-        fprintf(out, "\n");
+        printf_ex(out, "\n");
 
         for (int j = 0; j < fillFuncsCount; j++) {
             ftableCell_t ffill = fillFuncs[j];
 
-            fprintf(out, "%s;", ffill.name);
+            printf_ex(out, "%s;\n", ffill.name);
+            printf_ex(out, "n;T; ;n;S;\n");
 
             // Time Delta
             for (int n =  fsort.rangeMin; 
@@ -270,24 +281,27 @@ int main() {
                 ffill.invoke(arr, n, 0, n, 9);
 
                 DWORD delta = 0;
+                uint64_t counts = 0;
                 for (int k = 0; k < INVOKES_COUNT; k++) {   
                     DWORD t1 = get_tick_count();
+                    reset_comp_count();
                     fsort.invoke(arr, n, sizeof(key_t), comp_greater);
-                    DWORD t2 = get_tick_count();
 
-                    delta += t2 - t1;
+                    delta += get_tick_count() - t1;
+                    counts += get_comp_count();
                 }
 
                 delta /= INVOKES_COUNT;
+                counts /= INVOKES_COUNT;
 
-                fprintf(out, "%d;", delta);
+                printf_ex(out, "%d;%d; ;%d;%d;\n", n, delta, n, counts);
   
                 free(arr);
             }
 
-            fprintf(out, "\n");
+            printf_ex(out, "\n");
         }
-        fprintf(out, "\n");
+        printf_ex(out, "\n");
     }
 
 
