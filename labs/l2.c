@@ -188,8 +188,11 @@ void sort_arr_bubble_m(void* arr, size_t n, size_t size, cmpFun_t compareFunctio
 
 static int _quick_sort_partition(void* arr, int low, int high, size_t size, cmpFun_t compareFunction) {
     uint8_t* barr = arr;
-    // uint8_t* value = barr + (low + (int)arr % (high-low)) * size;
-    uint8_t* value = barr + ((high + low) / 2) * size;
+
+    int index = low + (int)arr % (high-low);
+    swap(&barr[high*size], &barr[index*size], size);
+
+    uint8_t* value = barr + high * size;
 
     int i = low - 1, j = high;
     for (;;)
@@ -288,6 +291,16 @@ int main() {
 
     };
     const int fillFuncsCount = sizeof(fillFuncs) / sizeof(*fillFuncs);
+
+
+    double arr[10] = {4, 3, 2, 6, 5, 9, 1, 8, 7, 0};
+    sort_arr_quick(arr, 10, sizeof(double), comp_greater);
+
+    print_arr(arr, 10);
+
+
+    return 1;
+
 
     FILE* csvFile = fopen("out.csv", "w"); 
     if (!csvFile) { printf("can't open csv :("); return 1; }
