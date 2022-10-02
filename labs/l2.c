@@ -269,12 +269,12 @@ int main() {
 	system("chcp 1251 > nul");
 
     const sortFuncCell_t sortFuncs[] = {
-        {"Быстрая",         sort_arr_quick,    500000, 5000000, 500000},
-        {"Быстрая Мод",     sort_arr_quick_m,  500000, 5000000, 500000},
+        // {"Быстрая",         sort_arr_quick,    500000, 5000000, 500000},
+        // {"Быстрая Мод",     sort_arr_quick_m,  500000, 5000000, 500000},
         {"std qsort",       qsort,             500000, 5000000, 500000},
 
-        {"Пузырек Мод",     sort_arr_bubble_m, 5000, 14000, 1000},
-        {"Пузырек",         sort_arr_bubble,   5000, 14000, 1000},
+        // {"Пузырек Мод",     sort_arr_bubble_m, 100000000, 200000000, 10000000},
+        // {"Пузырек",         sort_arr_bubble,   10000, 20000, 1000},
 
         // {"Вставками",       sort_arr_insertion,},
     };
@@ -282,8 +282,8 @@ int main() {
 
     const ftableCell_t fillFuncs[] = {
 		// { "Пилообразная", 						fill_arr_sawtooth 			},
-        { "Случайная", 							fill_arr_random 			},
-		{ "Упорядоченная", 						fill_arr_linear_upwards 	},
+        // { "Случайная", 							fill_arr_random 			},
+		// { "Упорядоченная", 						fill_arr_linear_upwards 	},
 		{ "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
 
     };
