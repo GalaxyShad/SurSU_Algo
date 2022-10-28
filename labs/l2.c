@@ -148,6 +148,7 @@ void sort_arr_quick(void* arr, size_t n, size_t size, cmpFun_t compareFunction) 
     _quick_sort_range(arr, 0, n-1, size, compareFunction);
 }
 
+
 void sort_arr_insertion(void* arr, size_t n, size_t size, cmpFun_t compareFunction) {
     int i, j;
     uint8_t* barr = arr;
@@ -182,6 +183,55 @@ void sort_arr_quick_m(void* arr, size_t n, size_t size, cmpFun_t compareFunction
     _quick_sort_modified_range(arr, 0, n-1, size, compareFunction);
 }
 
+
+void Quick4(key_t* A, int Low, int High) {
+    int i = Low - 1, j = High - 1, p = i, q = j, k;
+    key_t V;
+
+    if (High - Low <= 10)
+        return;
+
+    swap(&A[(Low + High) / 2], &A[High - 1], sizeof(key_t));
+
+    if (A[Low] > A[High - 1])
+        swap(&A[Low], &A[High - 1], sizeof(key_t));
+    if (A[Low] > A[High])
+        swap(&A[Low], &A[High], sizeof(key_t));
+    if (A[High - 1] > A[High])
+        swap(&A[High - 1], &A[High], sizeof(key_t));
+
+    V = A[High - 1];
+    for (;;) {
+        while (V > A[++i])
+            ;
+        while (V < A[--j])
+            ;
+        if (i >= j) break;
+        
+        swap(&A[i], &A[j], sizeof(key_t));
+        if (A[i] == V) {
+            p++;
+            swap(&A[p], &A[i], sizeof(key_t));
+        }
+        if (A[j] == V) {
+            q--;
+            swap(&A[q], &A[j], sizeof(key_t));
+        }
+    }
+    for (k = Low; k <= p; k++, j--)
+        swap(&A[k], &A[j], sizeof(key_t));
+    for (k = High - 1; k >= q; k--, i++)
+        swap(&A[k], &A[i], sizeof(key_t));
+
+    Quick4(A, Low, j);
+    Quick4(A, i, High);
+}
+
+void SortQuick4(void* A, size_t n, size_t size, cmpFun_t compareFunction)
+{
+    Quick4((key_t*)A, 0, n - 1);
+    sort_arr_insertion(A, n,  size, compareFunction);
+}
 
 void print_arr(const key_t* arr, size_t n) {
     for (int i = 0; i < n; i++) printf("%"MODIFIER" ", arr[i]);
@@ -237,6 +287,7 @@ int main() {
         // {"Быстрая",         sort_arr_quick,    500000, 5000000, 500000},
         // {"Быстрая Мод",     sort_arr_quick_m,  500000, 5000000, 500000},
         {"std qsort",       qsort,             500000, 5000000, 500000},
+        // {"SortQuick4",      SortQuick4,        500000, 5000000, 500000},
 
         // {"Пузырек Мод",     sort_arr_bubble_m, 100000000, 200000000, 10000000},
         // {"Пузырек",         sort_arr_bubble,   10000, 20000, 1000},
@@ -246,10 +297,10 @@ int main() {
     const int sortFuncsCount = sizeof(sortFuncs) / sizeof(*sortFuncs);
 
     const ftableCell_t fillFuncs[] = {
-		// { "Пилообразная", 						fill_arr_sawtooth 			},
+		{ "Пилообразная", 						fill_arr_sawtooth 			},
         // { "Случайная", 							fill_arr_random 			},
 		// { "Упорядоченная", 						fill_arr_linear_upwards 	},
-		{ "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
+		// { "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
 
     };
     const int fillFuncsCount = sizeof(fillFuncs) / sizeof(*fillFuncs);
@@ -263,7 +314,6 @@ int main() {
         sortFuncCell_t fsort = sortFuncs[i];  
 
         printf_ex(out, "%s;=;=;=;=;=;=;=;=;=;=;=;=;\n", fsort.name);
-
         printf_ex(out, "\n");
 
         for (int j = 0; j < fillFuncsCount; j++) {
@@ -279,6 +329,7 @@ int main() {
             ) {
                 key_t* arr = malloc(sizeof (key_t) * n);
                 ffill.invoke(arr, n, 0, n, 9);
+                // ffill.invoke(arr, n, 0, n, 10);
 
                 DWORD delta = 0;
                 uint64_t counts = 0;
