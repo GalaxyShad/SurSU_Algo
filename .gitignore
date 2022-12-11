@@ -1,4 +1,9 @@
-labs/*.exe
-# labs/*.csv
-.vscode
+**/.vscode
 build
+
+*.rar
+*.exe
+*.xlsx
+*.docx
+*.csv
+*.png
