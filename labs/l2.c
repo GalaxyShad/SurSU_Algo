@@ -275,6 +275,7 @@ int main() {
         // {"Быстрая",         sort_arr_quick,    500000, 5000000, 500000},
         // {"Быстрая Мод",     sort_arr_quick_m,  500000, 5000000, 500000},
         {"std qsort",       qsort,             500000, 5000000, 500000},
+        // {"SortQuick4",      SortQuick4,        500000, 5000000, 500000},
 
         // {"Пузырек Мод",     sort_arr_bubble_m, 100000000, 200000000, 10000000},
         // {"Пузырек",         sort_arr_bubble,   10000, 20000, 1000},
@@ -284,10 +285,10 @@ int main() {
     const int sortFuncsCount = sizeof(sortFuncs) / sizeof(*sortFuncs);
 
     const ftableCell_t fillFuncs[] = {
-		// { "Пилообразная", 						fill_arr_sawtooth 			},
+		{ "Пилообразная", 						fill_arr_sawtooth 			},
         // { "Случайная", 							fill_arr_random 			},
 		// { "Упорядоченная", 						fill_arr_linear_upwards 	},
-		{ "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
+		// { "Упорядоченная в обратном порядке", 	fill_arr_linear_downwards 	},
 
     };
     const int fillFuncsCount = sizeof(fillFuncs) / sizeof(*fillFuncs);
@@ -311,7 +312,6 @@ int main() {
         sortFuncCell_t fsort = sortFuncs[i];  
 
         printf_ex(out, "%s;=;=;=;=;=;=;=;=;=;=;=;=;\n", fsort.name);
-
         printf_ex(out, "\n");
 
         for (int j = 0; j < fillFuncsCount; j++) {
@@ -328,6 +328,7 @@ int main() {
                 key_t* arr = malloc(sizeof (key_t) * n);
 
                 ffill.invoke(arr, n, 0, n, 9);
+                // ffill.invoke(arr, n, 0, n, 10);
 
                 DWORD delta = 0;
                 uint64_t counts = 0;
