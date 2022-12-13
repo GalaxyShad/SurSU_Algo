@@ -50,9 +50,6 @@ int ReadPersons(Person* personArr) {
     return 1;
 }
 
-void PrintPersonSurnames(Person* personArr) {
-    for (int i = 0; i < N; printf("%s\n", personArr[i].Surname), i++);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -60,30 +57,35 @@ uint32_t GetHash(const Person* keyPerson) {
     uint32_t hash = 0;
 
     for (int i = 0; i < strlen(keyPerson->Surname); i++) {
-        hash = (hash << 5) - hash + keyPerson->Surname[i];
-        // hash = (hash << 8) + keyPerson->Surname[i];
+        //hash = (hash << 5) - hash + keyPerson->Surname[i];
+        hash = (hash << 2) - hash + keyPerson->Surname[i];      // Забрутфорсил число :D
     }
 
     return hash % HASH_TABLE_SIZE;
 }
 
+void PrintPersonSurnames(Person* personArr) {
+    for (int i = 0; i < N; i++) {
+        printf("0x%03x %s\n", GetHash(&personArr[i]), personArr[i].Surname);
+    }
+}
+
 int main() {
     Person personArr[N];
-    for (int i = 0; i < N; i++) {
-        strcpy(personArr[i].Surname, "none");
-        // printf("%s\n", personArr[i].Surname);
-    }
+    for (int i = 0; i < N; strcpy(personArr[i].Surname, "none"), i++);
     
     if (!ReadPersons(personArr)) printf("[ERR] Open a file");
 
-    // for (int i = 0; i < N; i++) {
-    //     printf("0x%03x %s\n", GetHash(&personArr[i]), personArr[i].Surname);
-    // }
-
-
     int personHashMap[HASH_TABLE_SIZE] = {0};
+
+    // Collisions calculations
     for (int i = 0; i < N; i++) {
         personHashMap[GetHash(&personArr[i])]++;
+    }
+
+    // Print Collisions
+    for (int i = 0; i < HASH_TABLE_SIZE; i++) {
+        printf("%d;%d\n", i+1, personHashMap[i]);
     }
 
     double k    = HASH_TABLE_SIZE / (double) N;
@@ -91,10 +93,17 @@ int main() {
 
     double stats = 0;
     for (int i = 0; i < HASH_TABLE_SIZE; i++) {
-        stats += (personHashMap[i] * k_) * (personHashMap[i] * k_);
+        stats += (personHashMap[i] - k_) * (personHashMap[i] - k_);
     }
 
-    printf("%lf %lf", k * stats, HASH_TABLE_SIZE * sqrt(HASH_TABLE_SIZE));
+    printf("M=%d N=%d\n", HASH_TABLE_SIZE, N);
+
+    printf(
+        "%lf [%lf %lf]", 
+        k * stats, 
+        HASH_TABLE_SIZE - sqrt(HASH_TABLE_SIZE), 
+        HASH_TABLE_SIZE + sqrt(HASH_TABLE_SIZE)
+    );
 
     return 0;
 }
